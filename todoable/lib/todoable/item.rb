@@ -24,7 +24,7 @@ class Item
       # so retrieving the item by grabbing the list and updating the local item
       # that way.
       list = Listable.get_list_from_id(token, list_id)
-      item = list.items.select {|s| s.id == @id}
+      item = list.items.select { |s| s.id == @id }
       @finished_at = item[0].finished_at
       return true
     else
