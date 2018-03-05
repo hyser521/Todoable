@@ -82,8 +82,8 @@ module Listable
     action = 'DELETE'
     # Delete all the items before deleting the list
     unless list.items.empty?
-      list.items.each do |_item|
-        list.delete_item(token, list, item_id)
+      list.items.each do |item|
+        list.delete_item(token, item.id)
       end
     end
     response = Todoable.make_request(uritail, token.token, nil, action)
@@ -94,18 +94,5 @@ module Listable
     else
       return 'Update failed ' + response.code + ' ' + response.message
     end
-  end
-
-
-
-  # Mark an item as finished
-  def self.mark_item_finished(token, list_id, item)
-    uritail = '/' + list_id + '/items/' + item.id + '/finish'
-    action = 'PUT'
-    response = Todoable.make_request(uritail, token.token, nil, action)
-    success = Todoable.response_logic(response, token, uritail, action, nil)
-    return success if success.instance_of? String
-    Item.finish(item, item['finished_at'])
-    true
   end
 end

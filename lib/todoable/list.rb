@@ -1,4 +1,4 @@
-require_relative "Item"
+require_relative 'Item'
 require 'Todoable'
 # List container
 class List
@@ -36,15 +36,15 @@ class List
 
   # Item methods
   # Add an item
-  def add_item(token, list_id, name)
-    uritail = '/' + list_id + '/items'
+  def add_item(token, name)
+    uritail = '/' + @id + '/items'
     action = 'POST'
     body = { 'item' => { 'name' => name } }
     response = Todoable.make_request(uritail, token.token, body, action)
-    success = Todoable.response_logic(response, token, uritail, action, body)
-    return success if success.instance_of? String
-    @items.push(Item.new(success['name'], success['id'],
-                         success['finished_at'], success['src']))
+    failure = Todoable.response_logic(response, token, uritail, action, body)
+    return failure if failure.instance_of? String
+    @items.push(Item.new(failure['name'], failure['id'],
+                         failure['finished_at'], failure['src']))
     true
   end
 
