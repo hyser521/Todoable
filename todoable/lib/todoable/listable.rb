@@ -82,8 +82,8 @@ module Listable
     action = 'DELETE'
     # Delete all the items before deleting the list
     unless list.items.empty?
-      list.items.each do |_item|
-        list.delete_item(token, list, item_id)
+      list.items.each do |item|
+        list.delete_item(token, item.id)
       end
     end
     response = Todoable.make_request(uritail, token.token, nil, action)
