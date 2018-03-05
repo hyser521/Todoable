@@ -50,7 +50,7 @@ module Todoable
     end
     response
   end
-  
+
   def self.response_logic(response, token, uritail, action, body = nil)
     # Good responses or errors should return information to the user.
     json = response.body

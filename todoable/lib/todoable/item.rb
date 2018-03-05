@@ -1,3 +1,6 @@
+require 'Todoable'
+require_relative 'Listable'
+
 # more user friendly way to interact with items
 # Makes immutable information immutable to user
 class Item
@@ -15,8 +18,17 @@ class Item
     action = 'PUT'
     response = Todoable.make_request(uritail, token.token, nil, action)
     success = Todoable.response_logic(response, token, uritail, action, nil)
-    return success if success.instance_of? String
-    @finished_at=item['finished_at']
-    true
+    case success
+    when '200', '201', '204'
+      # Provided Endpoint doesn't return an item hash in the response
+      # so retrieving the item by grabbing the list and updating the local item
+      # that way.
+      list = Listable.get_list_from_id(token, list_id)
+      item = list.items.select {|s| s.id == @id}
+      @finished_at = item[0].finished_at
+      return true
+    else
+      return 'Update failed ' + response.code + ' ' + response.message
+    end
   end
 end
