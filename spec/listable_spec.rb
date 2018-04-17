@@ -1,7 +1,7 @@
-require "todoable/Listable"
+require "todoable/listable"
 require 'spec_helper'
 
-RSpec.describe "Listable" do
+RSpec.describe Listable do
   include Listable
     let(:test_token) {Listable.authenticate}
     let(:list_id) {'a1edcc66-eba9-4e56-a125-b6978cd4082f'}

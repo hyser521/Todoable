@@ -2,9 +2,9 @@ require 'net/http'
 require 'uri'
 require 'json'
 
-# Calls Todoable API
+# Calls database API and formats response for processing
 module Todoable
-  # Method that actually touches the internet to get a token
+
   def self.token_call
     uri = URI.parse('http://todoable.teachable.tech/api/authenticate')
     request = Net::HTTP::Post.new(uri)
@@ -21,9 +21,8 @@ module Todoable
     response
   end
 
-  # Handles all request calls but the token get call.
   def self.make_request(uritail, token, body, action)
-    uri = URI.parse('http://todoable.teachable.tech/api/lists' + uritail)
+    uri = URI.parse("http://todoable.teachable.tech/api/lists#{uritail}")
     case action
     when 'GET'
       request = Net::HTTP::Get.new(uri)
@@ -37,7 +36,7 @@ module Todoable
       request = Net::HTTP::Put.new(uri)
     end
     request.content_type = 'application/json'
-    request['Authorization'] = 'Token token="' + token + '"'
+    request['Authorization'] = 'Token token="#{token}"'
     request['Accept'] = 'application/json'
     request.body = JSON.dump(body)
     req_options =
@@ -51,31 +50,29 @@ module Todoable
     response
   end
 
-  def self.response_logic(response, token, uritail, action, body = nil)
-    # Good responses or errors should return information to the user.
+  def self.format_API_response(response, token, uritail, action, body = nil)
+
     json = response.body
     case response.code
     when '200', '201', '204'
-      return JSON.parse(json) unless action == 'DELETE' || action == 'PUT' || action == 'PATCH'
-      return response.code
+      unless action == 'DELETE' || action == 'PUT' || action == 'PATCH'
+        return JSON.parse(json)
+      else
+        return response.code
+      end
     when '422'
       return json
-    # Unauthorized Logic
+    # Retry when unauthorized.
     when '401'
-      token = token.reauthenticate # attempt to get a new token
-
+      token = token.reauthenticate
       return 'No token could be obtained' if token.nil?
-      # try again and handle results
       response = Todoable.make_request(uritail, token.token, body, action)
       if !response.code == '200' || !response.code == '201'
-        error = 'Failure.  Code received '
-        return error + response.code + ' message ' + response.message
+        return "Failure.  Code received #{response.code} message #{response.message}"
       end
       return JSON.parse(response.body)
-    # Unknown code
     else
-      error = 'Failure.  Code received '
-      return error + response.code + ' message ' + response.message
+      return "Failure.  Code received #{response.code} message #{response.message}"
     end
   end
 end

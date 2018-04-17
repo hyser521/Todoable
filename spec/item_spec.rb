@@ -1,4 +1,4 @@
-require "todoable/Listable"
+require "todoable/listable"
 require 'spec_helper'
 
 RSpec.describe Item do
