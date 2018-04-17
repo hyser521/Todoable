@@ -1,6 +1,6 @@
 # Todoable
 
-An API wrapper for a to do list.
+An API wrapper for a to do list. I created this wrapper for a job interview in the first week I learned Ruby.  I'll be updating it as I go to show my progress with the language.
 
 ## Installation
 
